@@ -1,64 +1,63 @@
-% =============================================================================
-% Projeto 2: Esta em xeque? (Prolog)
-% Paradigmas de Linguagens de Programacao - 2s/2026
-% Prof. Antonio Luiz Basile - Universidade Presbiteriana Mackenzie
-%
-% Integrantes do grupo:
-%   - NOME COMPLETO 1 - RA
-%   - KAUÊ LIMA RODRIGUES MENESES - 10410594
-%   - NOME COMPLETO 3 - RA
-%
-% -----------------------------------------------------------------------------
-% COMO EXECUTAR (SWI-Prolog)
-%
-%   1) Abra o interpretador carregando o arquivo:
-%          swipl xeque.pl
-%
-%   2) Faca a consulta passando o tabuleiro em notacao Forsyth:
-%          ?- chess(["tcbdrbct","pppppppp",8,8,8,8,"PPPPPPPP","TCBDRBCT"]).
-%          false.
-%
-%          ?- chess(["4r3",8,8,8,8,8,"4t3","4R3"]).
-%          true.
-%
-%   3) Ou rode todos os exemplos que estao no final deste arquivo:
-%          ?- testes.
-%
-% -----------------------------------------------------------------------------
-% FORMATO DA ENTRADA
-%
-%   Uma lista com 8 elementos, um para cada linha do tabuleiro, comecando pela
-%   linha 8 (lado das pretas) e terminando na linha 1 (lado das brancas).
-%   Cada elemento pode ser:
-%     - um numero  : 8 significa "linha com 8 casas vazias";
-%     - uma string : cada letra e uma peca e cada digito e uma quantidade de
-%                    casas vazias seguidas. Ex.: "2t2R2" = 2 vazias, torre
-%                    preta, 2 vazias, rei branco, 2 vazias.
-%
-%   Pecas (nomes em portugues):
-%     t = torre   c = cavalo   b = bispo   d = dama   r = rei   p = peao
-%   Letra minuscula = peca PRETA.  Letra maiuscula = peca BRANCA.
-%
-% SAIDA
-%   true   se o rei branco ('R') esta em xeque;
-%   false  caso contrario.
-%   (e a propria resposta do Prolog: a consulta tem sucesso ou falha)
-%
-% -----------------------------------------------------------------------------
-% IDEIA GERAL DA SOLUCAO
-%
-%   1) Converter a entrada em uma matriz 8x8 (lista de 8 listas de 8 casas),
-%      onde cada casa e um caractere: a letra da peca ou '-' se estiver vazia.
-%   2) Procurar a posicao (Linha, Coluna) do rei branco 'R'.
-%   3) Em vez de olhar cada peca preta e ver se ela alcanca o rei, fazemos o
-%      contrario: partimos da casa do rei e olhamos "para fora":
-%        - nas 4 direcoes retas    -> a primeira peca encontrada e torre/dama?
-%        - nas 4 direcoes diagonais-> a primeira peca encontrada e bispo/dama?
-%        - nos 8 saltos em "L"     -> ha um cavalo preto?
-%        - nas 2 diagonais de cima -> ha um peao preto?
-%        - nas 8 casas vizinhas    -> ha o rei preto?
-%      Se qualquer uma dessas perguntas for verdadeira, o rei esta em xeque.
-% =============================================================================
+/* ============================================================================
+Projeto 2: Esta em xeque? (Prolog)
+Integrantes do grupo:
+  - ANA GABRIELLE DA SILVA OLIVEIRA - 10721801
+  - KAUÊ LIMA RODRIGUES MENESES - 10410594
+  - THEO ESPOSITO SIMÕES RESENDE - 10721356
+============================================================================== */
+
+
+/* -----------------------------------------------------------------------------
+COMO EXECUTAR (SWI-Prolog)
+
+  1) Abra o interpretador carregando o arquivo:
+         swipl xeque.pl
+
+  2) Faca a consulta passando o tabuleiro em notacao Forsyth:
+         ?- chess(["tcbdrbct","pppppppp",8,8,8,8,"PPPPPPPP","TCBDRBCT"]).
+         false.
+
+         ?- chess(["4r3",8,8,8,8,8,"4t3","4R3"]).
+         true.
+----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+FORMATO DA ENTRADA
+
+  Uma lista com 8 elementos, um para cada linha do tabuleiro, comecando pela
+  linha 8 (lado das pretas) e terminando na linha 1 (lado das brancas).
+  Cada elemento pode ser:
+    - um numero  : 8 significa "linha com 8 casas vazias";
+    - uma string : cada letra e uma peca e cada digito e uma quantidade de
+                   casas vazias seguidas. Ex.: "2t2R2" = 2 vazias, torre
+                   preta, 2 vazias, rei branco, 2 vazias.
+
+  Pecas (nomes em portugues):
+    t = torre   c = cavalo   b = bispo   d = dama   r = rei   p = peao
+  Letra minuscula = peca PRETA.  Letra maiuscula = peca BRANCA.
+
+SAIDA
+  true   se o rei branco ('R') esta em xeque;
+  false  caso contrario.
+  (e a propria resposta do Prolog: a consulta tem sucesso ou falha)
+
+----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+IDEIA GERAL DA SOLUCAO
+
+  1) Converter a entrada em uma matriz 8x8 (lista de 8 listas de 8 casas),
+     onde cada casa e um caractere: a letra da peca ou '-' se estiver vazia.
+  2) Procurar a posicao (Linha, Coluna) do rei branco 'R'.
+  3) Em vez de olhar cada peca preta e ver se ela alcanca o rei, fazemos o
+     contrario: partimos da casa do rei e olhamos "para fora":
+       - nas 4 direcoes retas    -> a primeira peca encontrada e torre/dama?
+       - nas 4 direcoes diagonais-> a primeira peca encontrada e bispo/dama?
+       - nos 8 saltos em "L"     -> ha um cavalo preto?
+       - nas 2 diagonais de cima -> ha um peao preto?
+       - nas 8 casas vizinhas    -> ha o rei preto?
+     Se qualquer uma dessas perguntas for verdadeira, o rei esta em xeque.
+------------------------------------------------------------------------------  */
 
 
 % -----------------------------------------------------------------------------
@@ -69,6 +68,7 @@
 %   se o rei estivesse sendo atacado por mais de uma peca, o Prolog ofereceria
 %   varias respostas "true" em vez de uma so.
 % -----------------------------------------------------------------------------
+
 chess(Entrada) :-
     monta_tabuleiro(Entrada, Tab),      % passo 1: matriz 8x8
     casa(Tab, L, C, 'R'),               % passo 2: acha o rei branco
@@ -76,9 +76,7 @@ chess(Entrada) :-
     !.
 
 
-% =============================================================================
-% PARTE 1 - CONVERSAO DA ENTRADA EM MATRIZ 8x8
-% =============================================================================
+% 1 - CONVERSAO DA ENTRADA EM MATRIZ 8x8
 
 % monta_tabuleiro(+Entrada, -Tab)
 %   Percorre a lista de entrada convertendo cada linha.
@@ -93,8 +91,7 @@ monta_tabuleiro([Linha|Resto], [Casas|RestoTab]) :-
 %   atom_codes e necessario aqui porque nao ha outra forma de "abrir" uma
 %   string ou um numero: ele funciona para os dois casos.
 %     "pp2"  ->  [112,112,50]         8  ->  [56]
-%   A primeira clausula cobre interpretadores em que "..." ja e uma lista
-%   de codigos (nesse caso nao ha nada a converter).
+
 codigos_da_linha([], []) :- !.
 codigos_da_linha([X|Xs], [X|Xs]) :- !.
 codigos_da_linha(Linha, Codigos) :-
@@ -122,9 +119,7 @@ vazias(N, ['-'|Resto]) :-
     vazias(N1, Resto).
 
 
-% =============================================================================
-% PARTE 2 - ACESSO AS CASAS DO TABULEIRO
-% =============================================================================
+% 2 - ACESSO AS CASAS DO TABULEIRO
 
 % enesimo(?N, +Lista, ?Elem)
 %   Elem e o N-esimo elemento da Lista (contando a partir de 1).
@@ -149,11 +144,9 @@ casa(Tab, L, C, Peca) :-
     enesimo(C, Linha, Peca).
 
 
-% =============================================================================
-% PARTE 3 - REGRAS DE ATAQUE
+% 3 - REGRAS DE ATAQUE
 %   atacado(+Tab, +L, +C): alguma peca preta ataca a casa (L, C).
 %   Cada clausula abaixo trata de um tipo de peca.
-% =============================================================================
 
 % --- Torre ou dama: linhas e colunas -----------------------------------------
 % Olhamos em cada direcao reta; a primeira peca que aparecer no caminho
@@ -218,10 +211,8 @@ continua('-', Tab, L, C, DL, DC, Peca) :- !,
 continua(Peca, _, _, _, _, _, Peca).
 
 
-% =============================================================================
-% PARTE 4 - FATOS AUXILIARES (pecas e deslocamentos)
+% 4 - FATOS AUXILIARES (pecas e deslocamentos)
 %   Cada deslocamento e um par (variacao da linha, variacao da coluna).
-% =============================================================================
 
 % Pecas pretas que atacam em linha reta e na diagonal.
 torre_ou_dama(t).
@@ -260,40 +251,5 @@ lado( 1).
 vizinha(DL, DC) :- direcao_reta(DL, DC).
 vizinha(DL, DC) :- direcao_diagonal(DL, DC).
 
-
-% =============================================================================
-% PARTE 5 - EXEMPLOS DE ENTRADA
-%   Execute com:  ?- testes.
-%   O resultado esperado esta no comentario ao lado de cada exemplo.
-% =============================================================================
-testes :-
-    % Posicao inicial do xadrez (exemplo do enunciado)            -> false
-    mostra(["tcbdrbct","pppppppp",8,8,8,8,"PPPPPPPP","TCBDRBCT"]),
-    % Torre preta na mesma coluna do rei, caminho livre           -> true
-    mostra(["4r3",8,8,8,8,8,"4t3","4R3"]),
-    % Torre preta na coluna, mas um peao branco bloqueia          -> false
-    mostra(["4r3",8,8,"4t3",8,8,"4P3","4R3"]),
-    % Bispo preto na diagonal do rei                              -> true
-    mostra(["4r3",8,8,"b7",8,8,8,"4R3"]),
-    % Dama preta na diagonal, bloqueada por peao branco           -> false
-    mostra(["4r3",8,8,8,"7d",8,"5P2","4R3"]),
-    % Dama preta na mesma linha do rei                            -> true
-    mostra(["4r3",8,8,8,8,8,8,"d3R3"]),
-    % Cavalo preto a um salto em "L" do rei                       -> true
-    mostra(["4r3",8,8,8,8,"3c4",8,"4R3"]),
-    % Peao preto na diagonal acima do rei                         -> true
-    mostra(["4r3",8,8,8,8,8,"3p4","4R3"]),
-    % Peao preto bem na frente do rei (peao nao captura reto)     -> false
-    mostra(["4r3",8,8,8,8,8,"4p3","4R3"]),
-    % Peao preto na diagonal ABAIXO do rei (ele nao anda p/ tras) -> false
-    mostra(["4r3",8,8,8,"4R3","3p4",8,8]).
-
-% mostra(+Entrada)
-%   Usado so pelos testes: escreve na tela o resultado de chess/1.
-%   E necessario porque, se chamassemos chess/1 direto dentro de testes/0,
-%   o primeiro tabuleiro sem xeque faria o predicado testes falhar e parar.
-mostra(Entrada) :-
-    chess(Entrada), !,
-    write(true), nl.
-mostra(_) :-
-    write(false), nl.
+% Exemplo de entrada:
+% chess(["tcbdrbct","pppppppp",8,8,8,8,"PPPPPPPP","TCBDRBCT"]).
