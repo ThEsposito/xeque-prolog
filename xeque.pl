@@ -5,7 +5,7 @@
 %
 % Integrantes do grupo:
 %   - NOME COMPLETO 1 - RA
-%   - NOME COMPLETO 2 - RA
+%   - KAUÊ LIMA RODRIGUES MENESES - 10410594
 %   - NOME COMPLETO 3 - RA
 %
 % -----------------------------------------------------------------------------
