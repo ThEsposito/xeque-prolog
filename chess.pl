@@ -11,7 +11,7 @@ Integrantes do grupo:
 COMO EXECUTAR (SWI-Prolog)
 
   1) Abra o interpretador carregando o arquivo:
-         swipl xeque.pl
+         swipl chess.pl
 
   2) Faca a consulta passando o tabuleiro em notacao Forsyth:
          ?- chess(["tcbdrbct","pppppppp",8,8,8,8,"PPPPPPPP","TCBDRBCT"]).
